@@ -26,3 +26,34 @@ int areEqual(ArrayUtil array1,ArrayUtil array2){
 	};
 	return 1;
 };
+
+ArrayUtil create(int typeSize, int length){
+	int i;
+	void* newArray;
+	ArrayUtil arr1;
+
+	newArray = calloc(length,typeSize);
+
+	arr1.base = newArray;
+	arr1.length = length;
+	arr1.typeSize = typeSize;
+	return arr1;
+}
+
+ArrayUtil resize(ArrayUtil array,int length){
+	int i;
+	ArrayUtil newArray;
+	
+	// int* base1 = array.base;
+	// int* base2 = newArray.base;
+
+	newArray.base = calloc(length,array.typeSize);
+	
+	for(i=0;i<length;i++){
+	
+		((int *)newArray.base)[i] =((int *)array.base)[i];
+		
+	}
+	
+	return newArray;
+};
