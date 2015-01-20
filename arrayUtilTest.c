@@ -3,9 +3,10 @@
 #include "../expr_assert.h"
 #include "arrayUtil.h"
 
-void test_are_equal_tell_the_two_array_are_equal_or_not(){
+void test_areEqual_tell_the_two_array_are_equal_or_not(){
 	int array1[]={1,2,3,4,5};
 	int array2[]={1,2,3,4,5};
+
 	int array3[]={1,2,5,4,5};
 
 	ArrayUtil arr1;
@@ -24,8 +25,8 @@ void test_are_equal_tell_the_two_array_are_equal_or_not(){
 	arr2.typeSize = sizeof(int);
 	arr2.length = 5;
 
-	assertEqual(areEqual(arr1, arr2), 0);
-	assertEqual(areEqual(arr1, arr1), 1);
+	assertEqual(areEqual(arr1, arr2), 1);
+	assertEqual(areEqual(arr1, arr3), 0);
 };
 
 void test_ArrayUtil_creat_return_Array_util_type_structure(){

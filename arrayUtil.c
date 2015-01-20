@@ -5,12 +5,12 @@
 	
 int areEqual(ArrayUtil array1,ArrayUtil array2){
 	int i;
-	int* base1 = array1.base;
-	int* base2 = array2.base;
+	char* base1 = array1.base;
+	char* base2 = array2.base;
 	int len1 = array1.length,
-	len2 = array2.length,
-	tSize1 = array1.typeSize,
-	tSize2 = array2.typeSize;
+		len2 = array2.length,
+		tSize1 = array1.typeSize,
+		tSize2 = array2.typeSize;
 
 
 	int totalLength = sizeof(array1.typeSize)*(array1.length);
@@ -19,7 +19,6 @@ int areEqual(ArrayUtil array1,ArrayUtil array2){
 		return 0;
 	};
 	for(i=0;i<totalLength;i++){
-
 		if(base1[i]!=base2[i]){
 			return 0;
 		}
@@ -46,7 +45,7 @@ ArrayUtil resize(ArrayUtil array,int length){
 	newArray.base = calloc(length,array.typeSize);
 	
 	for(i=0;i<array.length;i++){
-		((int *)newArray.base)[i] =((int *)array.base)[i];
+		((char *)newArray.base)[i] =((char *)array.base)[i];
 	}
 	return newArray;
 };
