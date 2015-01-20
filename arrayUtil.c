@@ -43,17 +43,55 @@ ArrayUtil create(int typeSize, int length){
 ArrayUtil resize(ArrayUtil array,int length){
 	int i;
 	ArrayUtil newArray;
-	
-	// int* base1 = array.base;
-	// int* base2 = newArray.base;
-
 	newArray.base = calloc(length,array.typeSize);
 	
-	for(i=0;i<length;i++){
-	
+	for(i=0;i<array.length;i++){
 		((int *)newArray.base)[i] =((int *)array.base)[i];
-		
 	}
-	
 	return newArray;
+};
+
+int findIndex(ArrayUtil array,int* ele){
+	int i;
+	int* base = array.base; 
+	
+	for(i=0;i<array.length;i++){
+		if( base[i] == * ele )
+			return i;
+	}
+	return -1;
+};
+
+void dispose(ArrayUtil array){
+	array.length =0;
+	array.typeSize=0;
+	array.base =0;
+
+	free(array.base);
+};
+
+void* findFirst(ArrayUtil array, match* fun, void* hint){
+	int i,result=0;
+	int* base = array.base;
+
+	for(i=0;i<array.length;i++){
+		result = fun((void*)base[i],hint);
+		if(result == 1){
+			return &base[i]; 
+		}
+	};
+	return NULL;
+};
+
+void* findLast(ArrayUtil array, match* fun, void* hint){
+	int i,result=0;
+	int* base = array.base;
+
+	for(i=array.length;i>0;i--){
+		result = fun((void*)base[i],hint);
+		if(result == 1){
+			return &base[i]; 
+		}
+	};
+	return NULL;
 };
