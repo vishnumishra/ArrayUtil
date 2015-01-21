@@ -3,41 +3,41 @@
 #include "../expr_assert.h"
 #include "arrayUtil.h"
 
-void test_areEqual_tell_the_two_array_are_equal_or_not(){
+ArrayUtil util1,util2;
+
+void tearDown(){
+	dispose(util1);
+	dispose(util2);
+}
+
+
+void test_areEqual_return_1_if_two_array_are_equal(){
 	int array1[]={1,2,3,4,5};
 	int array2[]={1,2,3,4,5};
 
-	int array3[]={1,2,5,4,5};
-
-	ArrayUtil arr1;
-	ArrayUtil arr2;
-	ArrayUtil arr3;
-
-	arr1.base =&array1;
-	arr1.typeSize = sizeof(int);
-	arr1.length = 5;
-
-	arr3.base =&array3;
-	arr3.typeSize = sizeof(int);
-	arr3.length = 5;
-
-	arr2.base =&array2;
-	arr2.typeSize = sizeof(int);
-	arr2.length = 5;
-
-	assertEqual(areEqual(arr1, arr2), 1);
-	assertEqual(areEqual(arr1, arr3), 0);
+	ArrayUtil util1 = {array1,sizeof(int),5};
+	ArrayUtil util2 = {array2,sizeof(int),5};
+	assertEqual(areEqual(util1, util2), 1);
+	tearDown();
 };
 
-void test_ArrayUtil_creat_return_Array_util_type_structure(){
+void test_areEqual_return_0_if_two_array_are_not_equal(){
+	int array1[]={1,2,3,4,5};
+	int array2[]={1,2,5,4,5};
+
+	ArrayUtil util1 = {array1,sizeof(int),5};
+	ArrayUtil util2 = {array2,sizeof(int),5};
+	assertEqual(areEqual(util1, util2), 0);
+	tearDown();
+};
+
+void test_creat_creat_Array_util_with_value_set_zero(){
 	ArrayUtil arr1;
 	int* base;
-
 	arr1 = create(4,5);
 	base = arr1.base;
 	assertEqual(base[0], 0);
 	assertEqual(base[4], 0);
-
 	free(base);
 };
 
