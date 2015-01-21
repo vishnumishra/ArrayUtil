@@ -23,28 +23,26 @@ ArrayUtil create(int typeSize, int length){
 	util.base =calloc(length,typeSize);
 	util.length = length;
 	util.typeSize = typeSize;
-	// util = {(int[])calloc(length,typeSize),typeSize,length};
 	return util;
 }
 
 ArrayUtil resize(ArrayUtil array,int length){
 	int i;
-	ArrayUtil newArray;
-	newArray.base = calloc(length,array.typeSize);
-	
-	for(i=0;i<array.length;i++){
-		((char *)newArray.base)[i] =((char *)array.base)[i];
-	}
-	return newArray;
+	void *base;
+
+	length=length<=array.length?length:array.length;
+	base = calloc(length,array.typeSize);
+	memcpy(base,array.base,array.length*array.typeSize);
+	array.base=base;
+	return array;
 };
 
-int findIndex(ArrayUtil array,int* ele){
+int findIndex(ArrayUtil array,void* ele){
 	int i;
-	int* base = array.base; 
-	
-	for(i=0;i<array.length;i++){
-		if( base[i] == * ele )
-			return i;
+	char* base = array.base; 
+	for(i=0;i<array.length*array.typeSize;i++){
+		if( base[i] == (char)ele )
+			return i/(array.typeSize);
 	}
 	return -1;
 };
@@ -53,19 +51,16 @@ void dispose(ArrayUtil array){
 	array.length =0;
 	array.typeSize=0;
 	array.base =0;
-
 	free(array.base);
 };
 
 void* findFirst(ArrayUtil array, match* fun, void* hint){
 	int i,result=0;
 	int* base = array.base;
-
 	for(i=0;i<array.length;i++){
 		result = fun((void*)base[i],hint);
-		if(result == 1){
+		if(result == 1)
 			return &base[i]; 
-		}
 	};
 	return NULL;
 };
@@ -73,12 +68,11 @@ void* findFirst(ArrayUtil array, match* fun, void* hint){
 void* findLast(ArrayUtil array, match* fun, void* hint){
 	int i,result=0;
 	int* base = array.base;
-
 	for(i=array.length;i>0;i--){
 		result = fun((void*)base[i],hint);
-		if(result == 1){
+		if(result == 1)
 			return &base[i]; 
-		}
 	};
 	return NULL;
 };
+

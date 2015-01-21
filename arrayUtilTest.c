@@ -41,81 +41,53 @@ void test_creat_creat_Array_util_with_value_set_zero(){
 	free(base);
 };
 
-void test_ArrayUtil_resize_return_Array_with_aspected_length(){
-	int array1[]={1,2,3,4,5,6};
-	ArrayUtil arr1,array;
-	int* base;
-
-	arr1.base =array1;
-	arr1.typeSize = sizeof(int);
-	arr1.length = 5;
-
-	array = resize(arr1,4);
-	base = array.base;
-
-	assertEqual(((int *)arr1.base)[3], 4);
-	free(base);
+void test_ArrayUtil_resize_return_Array_with_expected_length(){
+	int array[]={1,2,3,4,5,6};
+	ArrayUtil util = {array,sizeof(int),6},arr;
+	arr = resize(util,4);
+	assertEqual(((int *)arr.base)[3], 4);
+	free(arr.base);
 };
 
-void test_ArrayUtil_resize_set_eleement_of_the_array_zero_if_size_of_array_is_grater_(){
+void test_resize_set_eleement_of_the_array_zero_if_size_of_array_is_grater_(){
 	int src[]={1,2,3};
-	
-	ArrayUtil arr,array;
+	ArrayUtil util = {src,sizeof(int),3};
+	ArrayUtil array;
 	int* base;
-
-	arr.base =src;
-	arr.typeSize = sizeof(int);
-	arr.length = 3;
-
-	array = resize(arr,5);
-	base = array.base;
-	assertEqual(((int *)array.base)[4], 0);
-	free(base);
+	array = resize(util,5);
+	base = (int *)(array.base);
+	assertEqual(base[3], 0);
+	tearDown();
 };
 
-void test_ArrayUtil_resize_set_eleement_of_the_array_zero_if_size_of_array_is_grater_then_src_array(){
-	int src[]={5,3,5,2};
-	
-	ArrayUtil arr,array;
+void test_resize_should_contain_the_initial_array_element(){
+	int src[]={5,3};
+	ArrayUtil util={src,sizeof(int),4},array;
 	int* base;
+	array = resize(util,15);
+	base = (int *)(array.base);
+	assertEqual(base[0], 5);
+	assertEqual(base[1], 3);
+	assertEqual(base[14], 0);
 
-	arr.base =src;
-	arr.typeSize = sizeof(int);
-	arr.length = 4;
-
-	array = resize(arr,15);
-	base = array.base;
-	assertEqual(((int *)array.base)[14], 0);
-	free(base);
+	free(array.base);
 };
 
 void test_findIndex_will_return_the_array_index_of_the_element(){
 	int array[]={1,2,3,4,5};
 	int x=4;
-	ArrayUtil arr;
-
-	arr.base =&array;
-	arr.typeSize = sizeof(int);
-	arr.length = 5;
-
-	assertEqual(findIndex(arr,&x),3);
-
+	ArrayUtil arr = {array,sizeof(int),5};
+	assertEqual(findIndex(arr,(void*)x),3);
 }
 
 void test_findIndex_will_return_the_minus_1_if_array_element_is_not_present(){
-	int array[]={1,2,3,4,5};
+		int array[]={1,2,3,4,5};
 	int x=7;
-	ArrayUtil arr;
-
-	arr.base =&array;
-	arr.typeSize = sizeof(int);
-	arr.length = 5;
-
-	assertEqual(findIndex(arr,&x),-1);
+	ArrayUtil arr={array,sizeof(int),5};
+	assertEqual(findIndex(arr,(void*)x),-1);
 }
 
 void test_dispose_free_the_memory_allocated_for_the_array(){
-	// int array[] = {1,2,3,4,5};
 	int* array;
 	ArrayUtil arr;
 
@@ -125,46 +97,27 @@ void test_dispose_free_the_memory_allocated_for_the_array(){
 	array[2] = 5;
 	array[3] = -1;
 	array[4] = 43;
-
-	arr.base =&array;
-	arr.typeSize = sizeof(int);
-	arr.length = 5;
-
 	dispose(arr);
-	free(array);
 }
 
 int isDivisible(void* item, void* hint){
-	int*  num= item;
-
 	int* diviser =  hint;
 	return (( (int)item % *diviser)==0)?1:0;
 }
 
 void test_findFirst_return_5_when_we_give_isDivisible_by_5(){
-
-	ArrayUtil array;
 	int x =5;
-	int src[]={1,2,5,23,45};
 	void* result;
-	int* base;
-	array = create(4, 5);
-	array.base=&src;
-
+	ArrayUtil array = {(int[]){1,2,5,23,45},sizeof(int),5};
 	result  = findFirst(array, &isDivisible,&x );
 	assertEqual(*(int*)result , 5);
 }
 
 void test_findLast_return_5_when_we_give_isDivisible_by_5(){
-
-	ArrayUtil array;
 	int x =5;
-	int src[]={1,2,5,23,45};
 	void* result;
-	int* base;
-	array = create(4, 5);
-	array.base=&src;
-
+	ArrayUtil array = {(int[]){1,2,5,23,45},sizeof(int),5};
 	result  = findLast(array, &isDivisible,&x );
 	assertEqual(*(int*)result , 45);
 }
+
