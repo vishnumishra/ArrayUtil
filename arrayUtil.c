@@ -107,7 +107,10 @@ int filter(ArrayUtil util, match* fun, void* hint,void** destination,int maxitem
 };
 
 void map(ArrayUtil source, ArrayUtil destination, ConvertFunc* convert, void* hint){
-
+	int i;
+	for(i=0;i<source.length;i++){
+		convert(hint,source.base+(i*source.typeSize),destination.base+(i*source.typeSize));
+	}
 };
 
 

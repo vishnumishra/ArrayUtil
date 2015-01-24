@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include "expr_assert.h"
 #include "arrayUtil.h"
-ArrayUtil intUtil1,intUtil2,floatUtil1,floatUtil2,charUtil,strUtil,util,expectedUtil,util1,util2;
+ArrayUtil intUtil1,intUtil2,floatUtil1,floatUtil2,charUtil,strUtil,util,expectedUtil,util1,util2, resultUtil, expectedUtil;;
 
+int sample[] = {1,2,3,4,5};
 
 void setUp(){
 	intUtil1=(ArrayUtil){(int[]){1,2,5,23,45},sizeof(int),5};
@@ -823,4 +824,91 @@ void test_filter_returns_0_when_there_are_no_enven_no_in_existing_array(){
 }
 
 
-// 
+void multiplyBy(void* hint, void* sourceItem, void* destinationItem){
+    *(int*)destinationItem = *(int*)sourceItem * *(int*)(hint);
+}
+
+void test_map_converts_each_element_source_array_and_put_it_to_destination_array(){
+    int hint =10;
+    ArrayUtil expected={(int[]){10,20,30,40,50},sizeof(int),5};
+    util1=(ArrayUtil){(int[]){1,2,3,4,5},sizeof(int),5};
+    util2 =create(sizeof(int),5);
+    map(util1,util2,multiplyBy,&hint);
+    assert(areEqual(expected, util2));
+}
+void intConvertFunc(void* hint, void* sourceItem, void* destinationItem){
+
+	*((int *)destinationItem) = *((int *)hint) + *((int *)sourceItem);
+}
+
+void charConvertFunc(void* hint, void* sourceItem, void* destinationItem){
+	*((char*)destinationItem) = *((char*)sourceItem) - 32;
+}
+
+void test_map_gives_2_3_4_5_6_for_1_2_3_4_5_for_integer_array(){
+	ArrayUtil src = {(int[]){1,2,3,4,5},sizeof(int),5},dest = create(sizeof(int),5);
+	ArrayUtil tmp = {(int[]){2,3,4,5,6},sizeof(int),5};
+	int hint = 1;
+	map(src,dest,intConvertFunc,&hint);
+	assert(areEqual(dest,tmp)==1);
+	dispose(dest);
+}
+void test_map_gives_A_B_C_D_E_for_a_b_c_d_e_for_character_array(){
+	ArrayUtil src = {(char[]){'a','b','c','d','e'},sizeof(char),5},dest = create(sizeof(char),5);
+	ArrayUtil tmp = {(char[]){'A','B','C','D','E'},sizeof(char),5};
+	char hint = 32;
+	map(src,dest,charConvertFunc,&hint);
+	assertEqual(areEqual(dest,tmp),1);
+	dispose(dest);
+}
+void increment(void* hint, void* sourceItem, void* destinationItem){
+	int *hintPtr = (int*)hint;
+	int *numberPtr = (int*)sourceItem;
+	int *resultPtr = (int*)destinationItem;
+	*resultPtr = *numberPtr + *hintPtr;
+}
+
+void test_map_should_map_source_to_destination_using_the_provided_convert_function(){
+	int hint = 1, result[] = {2,3,4,5,6};
+	util = (ArrayUtil){sample, sizeof(int), 5};
+	resultUtil = create(util.typeSize, util.length);
+	expectedUtil = (ArrayUtil){result, sizeof(int), 5};
+	map(util, resultUtil, increment, &hint);
+	assert(areEqual(expectedUtil, resultUtil));
+	dispose(resultUtil);
+}
+void increment_by_1(void *hint, void *sourceItem, void *destinationItem){
+	*(int*)destinationItem = *(int*)sourceItem+1;
+}
+
+void test_map_increments_by_one_all_array_elements(){
+	void *hint;
+	int array[]={1,2,3,4,5};
+	int newArray[]={2,3,4,5,6};
+	ArrayUtil util={array,INT_SIZE,5};
+	ArrayUtil expected={newArray,INT_SIZE,5};
+	ArrayUtil mapped={calloc(5,INT_SIZE),INT_SIZE,5};
+	map(util,mapped,increment_by_1,&hint);
+	assert(areEqual(expected, mapped));
+	assert(arrayEqual(newArray,expected.base));
+}
+
+void square_elements(void *hint, void *sourceItem, void *destinationItem){
+	*(int*)destinationItem=*(int*)sourceItem * *(int*)sourceItem;
+}
+
+void test_map_returns_square_of_each_element_in_array(){
+	void *hint;
+	int array[]={1,2,3,4,5};
+	int newArray[]={1,4,9,16,25};
+	ArrayUtil util={array,INT_SIZE,5};
+	ArrayUtil expected={newArray,INT_SIZE,5};
+	ArrayUtil mapped={calloc(5,INT_SIZE),INT_SIZE,5};
+	map(util,mapped,square_elements,&hint);
+	assert(areEqual(expected, mapped));
+	assert(arrayEqual(newArray,expected.base));
+}
+
+
+
+

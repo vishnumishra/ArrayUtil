@@ -24,6 +24,7 @@ typedef struct arrayUtil{
 typedef int (match)(void*,void*);
 typedef int (strMatch)(void*,void*);
 typedef void(ConvertFunc)(void*,void*,void*);
+ArrayUtil util, resultUtil, expectedUtil;
 
 int areEqual(ArrayUtil array1,ArrayUtil array2);
 ArrayUtil create(int typeSize, int length);
