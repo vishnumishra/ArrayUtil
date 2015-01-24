@@ -92,22 +92,22 @@ int count(ArrayUtil array, match* fun, void* hint){
 
 int filter(ArrayUtil util, match* fun, void* hint,void** destination,int maxitem){
 	int i,count=0;
-	void *item,*result = calloc(maxitem,util.length);
+	void *item,*result;
+	result = calloc(maxitem,util.length);
+	
 	for(i=0;(i<util.length) && (count< maxitem) ;i++){
-		item = util.base+(util.typeSize*i);
+		item = &(util.base[(util.typeSize*i)]);
 		if(fun(hint,item)){
-			printf("item is %d\n",*(int*)item);
-			// result+count*util.typeSize) = item; 
-			destination[count*util.typeSize] = item;
+			memcpy(result+(count*util.typeSize),item,util.typeSize);			
 			count++;
 		}
 	}
-	destination = result;
+	*destination = result;
 	return count;
 };
 
+void map(ArrayUtil source, ArrayUtil destination, ConvertFunc* convert, void* hint){
 
-
-
+};
 
 

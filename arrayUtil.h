@@ -23,6 +23,7 @@ typedef struct arrayUtil{
 
 typedef int (match)(void*,void*);
 typedef int (strMatch)(void*,void*);
+typedef void(ConvertFunc)(void*,void*,void*);
 
 int areEqual(ArrayUtil array1,ArrayUtil array2);
 ArrayUtil create(int typeSize, int length);
@@ -33,3 +34,5 @@ void* findFirst(ArrayUtil util, match* fun, void* hint);
 void* findLast(ArrayUtil util, match* fun, void* hint);
 int count(ArrayUtil util, match* fun, void* hint);
 int filter(ArrayUtil util, strMatch* fun, void* hint,void** destination,int maxitem);
+
+void map(ArrayUtil source, ArrayUtil destination, ConvertFunc* convert, void* hint);

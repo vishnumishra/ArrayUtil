@@ -5,6 +5,7 @@
 #include "arrayUtil.h"
 ArrayUtil intUtil1,intUtil2,floatUtil1,floatUtil2,charUtil,strUtil,util,expectedUtil,util1,util2;
 
+
 void setUp(){
 	intUtil1=(ArrayUtil){(int[]){1,2,5,23,45},sizeof(int),5};
 	intUtil2=(ArrayUtil){(int[]){1,15,5,31,45},sizeof(int),5};
@@ -546,6 +547,7 @@ void test_findFirst_returns_the_adsdress_of_first_element_in_the_array_greater_t
 }
 
 int isGreaterThanHint (void* hint, void* element) {
+	// printf("%d\t%d\n",*((int*)element),*((int*)hint)) ;
 	return (*((float*)element) > *((float*)hint));
 }
 
@@ -641,3 +643,184 @@ void test_filter_should_copy_to_destination_only_matching_criteria(){
 int Divisible(void* a,void *b){
 	return (*((int*)b)%*((int*)a) == 0) ? 1 : 0;
 }
+void test_filter_gives_2_4_for_1_2_3_4_5(){
+	ArrayUtil util = create(sizeof(int),5);
+	int *arr,i,result,hint = 2,*lIst;
+	void* list;
+	arr = (int*)util.base;
+	for(i=0;i<5;i++){
+		arr[i] = i+1;
+	}
+	printf("add in test %p\n",list );
+
+	result = filter(util, isDivisible,&hint,&list,2);
+	lIst = (int*)list;
+	printf("add in test %p\n",&list[0] );
+	assertEqual(result,2);
+	assertEqual(lIst[0],2);
+	assertEqual(lIst[1],4);
+	free(list); 
+}
+void test_filter_gives_D_E_for_a_b_c_D_E() {
+	ArrayUtil a = {(char[]){'a','b','c','D','E'},sizeof(char),5};
+	char *result,hint = 'a',*lIst;
+	void* list;
+	int count;
+	count =  filter(a,isUpperCase,&hint,&list,2);
+	lIst = (char*)list;
+	assert(count==2);
+	assertEqual(lIst[0],'D');
+	assertEqual(lIst[1],'E');
+	free(list); 
+}
+int compare(void *hint,void* item){
+	if(*(char*)item=='a')
+		return 1;
+	return 0;
+};
+
+void test_filter_will_return_the_array_a_a_a(){
+	char a[]={'a','a','a','b','d'},hint=3;
+	int length;
+	void* result;
+	ArrayUtil array = {a, sizeof(char), 5};
+	length = filter(array,compare,&hint,&result,5);
+
+	assertEqual(((char*)result)[1],'a');
+	assertEqual(length,3);
+	free(result);
+};
+void test_filter_filters_the_util_floatArray_which_matches_the_criteria (){
+	float hint = 5.1;
+	match *match = &isGreaterThanHint;
+	ArrayUtil util = {(float[]){7.1,2.4,1.6,3.7,8.3,0.1},FLOAT_SIZE,6};
+	float *destination;
+	destination = malloc(FLOAT_SIZE*2);
+	assertEqual(filter(util, match, (void*)&hint, (void*)&destination, 4),2);
+	assertEqual(destination[0], (float)7.1);
+	assertEqual(destination[1], (float)8.3);
+}
+int isEqual(void* hint, void* item){
+	if(*(int*)item==8 ||*(float*)item == 9.0 || *(double*)item==8.9)
+		return 1;
+	return 0;
+}
+void test_filter_will_return_the_array_of_only_two_8(){
+	int a[]={1,8,8,7,8,9},hint=3,length;
+	void* result;
+	ArrayUtil array = {a, sizeof(int), 6};
+	length = filter(array,isEqual,&hint,&result,2);
+
+	assertEqual(((int*)result)[1],8);
+	assertEqual(length,2);
+	free(result);
+};
+void test_filter_will_return_the_array_of_only_two_8_point_7_in_float(){
+	float a[]={1.4,8.4,8.9,7,8,9.0},hint=3;
+	int length;
+	void* result;
+	ArrayUtil array = {a, sizeof(float), 6};
+	length = filter(array,isEqual,&hint,&result,2);
+
+	assertEqual(((float*)result)[0],9.0);
+	assertEqual(length,1);
+	free(result);
+};
+// void test_filter_will_return_the_array_of_only_one_element_8_point_9_in_double(){
+// 	double a[]={8.4,8.4,8.9},hint=3.9;
+// 	int length;
+// 	void* result;
+// 	ArrayUtil array = {a, sizeof(double), 3};
+// 	length = filter(array,isEqual,&hint,&result,2);
+
+// 	assertEqual(((double*)result)[0],8.9);
+// 	assertEqual(length,1);
+// 	free(result);
+// };
+int stringCompare(void *hint, void* item){
+	String str ="hello";
+	String getItem = *(String*)item;
+	if(getItem==str)
+		return 1;
+	return 0;
+}
+
+// void test_filter_will_return_the_array_string_contain_hello(){
+// 	int length,hint=9;
+// 	void* result,*expected;
+// 	ArrayUtil array = create(sizeof(String),2);
+// 	((char**)array.base)[0]="hello";
+// 	((char**)array.base)[1]="gello";
+// 	length = filter(array,stringCompare,&hint,&result,2);
+// 	expected = ((String*)result)[0];
+	
+// 	assertEqual(length,1);
+// 	assertEqual(strcmp(expected,"hello"),0);
+// };
+
+void test_filter_will_return_the_array_of_8_8_8(){
+	int a[]={1,8,8,7,8,9},hint=3,length;
+	void* result;
+	ArrayUtil array = {a, sizeof(int), 6};
+	length = filter(array,isEqual,&hint,&result,5);
+
+	assertEqual(((int*)result)[0],8);
+	assertEqual(length,3);
+	free(result);
+};
+
+void test_filter_populate_destination_array_with_evenNumbers(){
+    int maxItem=6;
+    void *evens;
+    int hint = 0;
+    util1 = (ArrayUtil){(int[]){101,22,12,13},sizeof(int),4};
+   	 
+	 assertEqual(filter(util1,isEven,&hint,&evens,maxItem),2);
+	 assertEqual(((int*)evens)[0],22);
+	 assertEqual(((int*)evens)[1],12);
+}
+void test_filter_filters_the_util_intArray_which_matches_the_criteria (){
+	int hint = 4;
+	match *match = &isGreaterThanHint;
+	ArrayUtil util = {(int[]){7,2,6,3,8,9},INT_SIZE,6};
+	int *destination;
+	destination = malloc(INT_SIZE*4);
+	assertEqual(filter(util, match, (void*)&hint, (void*)&destination, 4),4);
+	assertEqual(destination[0], 7);
+	assertEqual(destination[1], 6);
+	assertEqual(destination[2], 8);
+	assertEqual(destination[3], 9);
+}
+int arrayEqual(int*arr1,int*arr2){
+	int i,length1 = sizeof(arr1)/sizeof(arr1[0]),length2 = sizeof(arr2)/sizeof(arr1[0]);
+	if(length1 != length2)
+		return 0;
+
+	for(i=0;i<length1;i++){
+		if(arr1[i]!=arr2[i])
+			return 0;
+	}
+	return 1;
+};
+void test_filter_fills_filtered_array_with_even_numbers_of_existing_array_and_returns_count(){
+	int array[]={1,2,3,4,5,6,7,8};
+	int newArray[]={2,4,6,8};
+	ArrayUtil util={array,INT_SIZE,8};
+	int *filtered=(int *)malloc(INT_SIZE*5);
+	int counter=filter(util,isEven,0,(void**)&filtered,5);
+ 	assertEqual(counter,4);
+ 	assert(arrayEqual(newArray,filtered));
+ 	free(filtered);
+}
+
+void test_filter_returns_0_when_there_are_no_enven_no_in_existing_array(){
+	int array[]={1,3,5,7};
+	ArrayUtil util={array,INT_SIZE,4};
+	int *filtered=(int *)malloc(INT_SIZE*2);
+	int counter=filter(util,isEven,0,(void**)&filtered,2);
+ 	assertEqual(counter,0);
+ 	free(filtered);
+}
+
+
+// 
