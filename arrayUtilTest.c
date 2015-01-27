@@ -748,7 +748,8 @@ int stringCompare(void *hint, void* item){
 
 // void test_filter_will_return_the_array_string_contain_hello(){
 // 	int length,hint=9;
-// 	void* result,*expected;
+// 	void* result;
+// 	char* expected;
 // 	ArrayUtil array = create(sizeof(String),2);
 // 	((char**)array.base)[0]="hello";
 // 	((char**)array.base)[1]="gello";
@@ -909,6 +910,131 @@ void test_map_returns_square_of_each_element_in_array(){
 	assert(arrayEqual(newArray,expected.base));
 }
 
+void element_into_element_plus_one(void* hint, void* item){
+	*((int *)item)= *((int *)item) * ((*((int *)item))+1);
+}
 
+void test_forEach_does_multiplication_of_item_with_item_plus_one(){
+	void *hint;
+	int array[]={1,2,3,4,5};
+	int incremented[]={2,6,12,20,30};
+	ArrayUtil util={array,INT_SIZE,5};
+	ArrayUtil expected={incremented,INT_SIZE,5};
+	forEach(util,element_into_element_plus_one,&hint);
+	assert(areEqual(util,expected));
+}
 
+void intAddOperation(void* hint, void* item) {
+	*((int *)item) = *((int *)hint) + *((int *)item);	
+}
 
+void test_forEach_gives_2_3_4_5_6_for_1_2_3_4_5_in_same_array(){
+	ArrayUtil src = create(sizeof(int),5);
+	int *arr,i,hint = 1,*list;
+	arr = (int*)src.base;
+	for(i=0;i<5;i++){
+		arr[i] = i+1;
+	}
+	list = ((int*)src.base);
+	forEach(src,intAddOperation,&hint);
+	assertEqual(list[0],2);
+	assertEqual(list[1],3);
+	assertEqual(list[2],4);
+	assertEqual(list[3],5);
+	assertEqual(list[4],6);
+	dispose(src);
+}
+void minusBy1(void* hint,void* element){
+	  *(int*)element = *(int*)element - *(int*)hint;
+};
+void minusBy1Float(void* hint,void* element){
+	  *(float*)element = *(float*)element - *(float*)hint;
+};
+void test_forEach_gives_minus_1_0_1_2_3_for_0_1_2_3_4(){
+	ArrayUtil array = create(sizeof(int),5);
+	int i,*elements,hint=1;
+	for(i=0;i<5;i++){((int*)array.base)[i] = i;};
+	elements = ((int*)array.base);
+
+	forEach(array,minusBy1,&hint);
+	assertEqual(elements[0],-1);
+	assertEqual(elements[1],0);
+	assertEqual(elements[4],3);
+	dispose(array);
+};
+
+void test_forEach_gives_minus_1_0_1_for_0_1_2_(){
+	ArrayUtil array = create(sizeof(float),3);
+	float *elements,hint=1;
+	int i;
+	for(i=0;i<3;i++){((float*)array.base)[i] = i;};
+	elements = ((float*)array.base);
+
+	forEach(array,minusBy1Float,&hint);
+
+	assertEqual(((float*)array.base)[0],-1);
+	assertEqual(((float*)array.base)[1],0);
+	assertEqual(((float*)array.base)[2],1.0);
+	dispose(array);
+};
+
+void printCharAddby1(void* hint,void* item){
+	*(char*)item = *(char*)item + *(char*)hint;
+};
+
+void test_forEach_gives_a_b_c_for_a_b_c(){
+	ArrayUtil array = create(sizeof(char),3);
+	char *elements,hint=1;
+	int i;
+	for(i=0;i<5;i++){((char*)array.base)[i] = 'a'+i;};
+	elements = ((char*)array.base);
+
+	forEach(array,printCharAddby1,&hint);
+
+	assertEqual(((char*)array.base)[0],98);
+	assertEqual(((char*)array.base)[1],99);
+	assertEqual(((char*)array.base)[2],100);
+	dispose(array);
+};
+
+void* sum (void* hint, void* pv, void* cv){
+	int* _pv = (int*)pv;
+	int* _cv = (int*)cv;
+	int* result = (int*)malloc(INT_SIZE); 
+	*result = *_pv + *_cv;
+	return result;
+}
+
+void test_reduce_returns_sum_of_all_integers_of_array (){
+	int hint = 2,result;
+	int initial_value = 0;
+	int array[] = {1,2,3};
+	void* (*fn_ptr)(void*,void*,void*) = &sum;
+	ArrayUtil util = create(INT_SIZE,3);
+	util.base = (void*)array;
+	result = *(int*)reduce(util,fn_ptr,(void*)&hint,(void*)&initial_value);
+	assertEqual(result,6);
+};
+void *add_all(void* hint, void* previousItem, void* item){
+	*((int*)item)= *((int*)previousItem) + *((int*)item);
+	return ((int*)item);
+}
+
+void test_reduce_gives_15_when_elements_are_1_2_3_4_5_and_initial_value_is_0(){
+	void *hint;
+	int initialValue=0;
+	int array[]={1,2,3,4,5};
+	ArrayUtil util={array,INT_SIZE,5};
+	void *return_value = reduce(util,add_all,&hint,&initialValue);
+	assertEqual(*((int*)return_value),15);
+
+};
+
+void test_reduce_gives_30_when_elements_are_1_2_3_4_5_and_initial_value_is_15(){
+	void *hint;
+	int intialValue=15;
+	int array[]={1,2,3,4,5};
+	ArrayUtil util={array,INT_SIZE,5};
+	void *return_value=reduce(util,add_all,&hint,&intialValue);
+	assertEqual(*((int*)return_value),30);
+}

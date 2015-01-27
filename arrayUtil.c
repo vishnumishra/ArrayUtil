@@ -94,7 +94,6 @@ int filter(ArrayUtil util, match* fun, void* hint,void** destination,int maxitem
 	int i,count=0;
 	void *item,*result;
 	result = calloc(maxitem,util.length);
-	
 	for(i=0;(i<util.length) && (count< maxitem) ;i++){
 		item = &(util.base[(util.typeSize*i)]);
 		if(fun(hint,item)){
@@ -113,4 +112,19 @@ void map(ArrayUtil source, ArrayUtil destination, ConvertFunc* convert, void* hi
 	}
 };
 
+void forEach(ArrayUtil util, OperationFunc* operation, void* hint){
+	int i;
+	for(i=0;i<util.length;i++){
+		operation(hint,util.base+(i*util.typeSize));
+	}
+};
 
+void* reduce(ArrayUtil util, ReducerFunc* reducer, void* hint, void* initialValue){
+	int i;
+	void* result;
+	for(i=0;i<util.length;i++){
+		result = reducer(hint,initialValue,util.base+(i*util.typeSize));	
+		initialValue = result;
+	}
+	return result;
+}
