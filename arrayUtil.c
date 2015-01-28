@@ -31,7 +31,7 @@ ArrayUtil resize(ArrayUtil array,int length){
 	void *base;
 	int cpyLength = (length <= array.length?length:array.length)*array.typeSize;
 	int newLength = length;
-	length=length>=array.length?length:array.length;
+	length = (length >= array.length) ? length : array.length;
 	base = calloc(length,array.typeSize);
 	memcpy(base,array.base,cpyLength);
 	array.base=base;
@@ -92,16 +92,14 @@ int count(ArrayUtil array, match* fun, void* hint){
 
 int filter(ArrayUtil util, match* fun, void* hint,void** destination,int maxitem){
 	int i,count=0;
-	void *item,*result;
-	result = calloc(maxitem,util.length);
+	void *item;
 	for(i=0;(i<util.length) && (count< maxitem) ;i++){
-		item = &(util.base[(util.typeSize*i)]);
+		item = util.base+(util.typeSize*i);
 		if(fun(hint,item)){
-			memcpy(result+(count*util.typeSize),item,util.typeSize);			
-			count++;
+			destination[count] = item;
+			++count;
 		}
 	}
-	*destination = result;
 	return count;
 };
 
@@ -121,10 +119,9 @@ void forEach(ArrayUtil util, OperationFunc* operation, void* hint){
 
 void* reduce(ArrayUtil util, ReducerFunc* reducer, void* hint, void* initialValue){
 	int i;
-	void* result;
+	void* result=initialValue;
 	for(i=0;i<util.length;i++){
-		result = reducer(hint,initialValue,util.base+(i*util.typeSize));	
-		initialValue = result;
+		result = reducer(hint,result,util.base+(i*util.typeSize));	
 	}
 	return result;
 }
